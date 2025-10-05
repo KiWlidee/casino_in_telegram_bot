@@ -1,6 +1,6 @@
 import sqlite3 as sq
 
-with sq.connect("infouser.db") as db:
+with sq.connect("C:\\vscodepj\\casino_telegram_bot\\infouser.db") as db:   # C:\\vscodepj\\casino_telegram_bot\\ added
     cursor = db.cursor()
     cursor.execute("""CREATE TABLE IF NOT EXISTS 
                    personality(telegram_id TEXT,
