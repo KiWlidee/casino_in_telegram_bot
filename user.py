@@ -79,7 +79,7 @@ def slots_spin_add(id):
         cursor.execute(f"""UPDATE personality SET spins = spins + 1 WHERE telegram_id == '{id}'""")
 
 
-def slots_spin_minus_money(id):
+def minus_money(id):
     with sq.connect("C:\\vscodepj\\casino_telegram_bot\\infouser.db") as db:
         cursor = db.cursor()
         cursor.execute(f"""UPDATE personality SET money = money - 50 WHERE telegram_id == '{id}' AND money >= 50""")

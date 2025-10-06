@@ -1,7 +1,15 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
 register = ReplyKeyboardMarkup(keyboard=[[
-    KeyboardButton(text="✍ Зарегистрироваться / 🔑 Войти")
+    KeyboardButton(text="✍ Зарегистрироваться / 🔑 Войти"),
+    KeyboardButton(text="🛠️")
+]], resize_keyboard=True)
+
+
+ADMIN_panel = ReplyKeyboardMarkup(keyboard=[[
+    KeyboardButton(text="✏️ Добавить(уменьшить через (-)) деньги пользователю"),
+    KeyboardButton(text="👥 Поиск профиля пользователя по id"),
+    KeyboardButton(text="➡️ Перейти в основное меню")
 ]], resize_keyboard=True)
 
 

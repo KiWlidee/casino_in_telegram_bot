@@ -17,6 +17,18 @@ router = Router()
 
 casino_slots = ["🍒", "🍒", "🍒", "🍏", "🍏", "🍇", "🍓", "🍑", "💩"]
 
+#  blackjack = [2, 2, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 
+# 6, 6, 6, 6, 7, 7, 7, 7, 8, 8, 8, 8, 9, 9, 9, 9, 10, 10, 10, 10]
+
+class Admin_enter_to_panel(StatesGroup):
+    waiting_number = State()
+
+class Admin_change_money(StatesGroup):
+    waiting_number = State()
+
+class Admin_finder_people(StatesGroup):
+    waiting_number = State()
+
 class RouletteStates_one(StatesGroup):
     waiting_number = State()
 
@@ -48,6 +60,45 @@ async def register(message: Message):
     else:
         await message.answer("🔑 Вы успешно вошли в свой аккаунт!", reply_markup=kb.main_menu)
 
+@router.message(F.text == "🛠️")
+async def admin_panel(message: Message, state: FSMContext):
+    await message.answer("Это - Админ панель, сюда не суйся.")
+    await state.set_state(Admin_enter_to_panel.waiting_number)
+
+@router.message(Admin_enter_to_panel.waiting_number)
+async def process_admin_password(message: Message, state: FSMContext):
+    if message.text == "8038":
+        await message.answer("Привет, Админ!", reply_markup=kb.ADMIN_panel)
+        await state.clear()
+    else: 
+        await register(message)
+        state.clear()
+    
+
+@router.message(F.text == "✏️ Добавить(уменьшить через (-)) деньги пользователю")
+async def admin_change_money(message: Message, state: FSMContext):
+    await message.answer("Введите id пользователя и нужное колличество денег, через пробел.")
+    await state.set_state(Admin_change_money.waiting_number)
+
+@router.message(Admin_change_money.waiting_number)
+async def process_admin_change_money(message: Message, state: FSMContext):
+    id, money = message.text.split()
+    user.money_winner(id, money)
+    await message.answer("Все готово!", reply_markup=kb.ADMIN_panel)
+    await state.clear()
+
+@router.message(F.text == "👥 Поиск профиля пользователя по id")
+async def admin_finder_people(message: Message, state: FSMContext):
+    await message.answer("Введите id пользователя")
+    await state.set_state(Admin_finder_people.waiting_number)
+
+@router.message(Admin_finder_people.waiting_number)
+async def process_admin_finder_people(message: Message, state: FSMContext):
+    stats = user.profile_stats(int(message.text))
+    for i in stats:
+        await message.answer(i, reply_markup=kb.ADMIN_panel)
+    await state.clear()
+
 @router.message(F.text == "➡️ Перейти в основное меню")
 async def casino_menu(message: Message):
     await message.answer("Поднял бабла, стали другими дела.", reply_markup=kb.main_menu)
@@ -72,10 +123,9 @@ async def spin_slots(message: Message):
 
 @router.message(F.text == "⬆️ Крутим")
 async def spin_slots(message: Message):
-    if user.slots_spin_minus_money(message.from_user.id) == "Деньги списаны.":
+    if user.minus_money(message.from_user.id) == "Деньги списаны.":
         user.how_much_u_lose(message.from_user.id, 50)
         user.slots_spin_add(message.from_user.id)
-        await message.answer(user.slots_spin_minus_money(message.from_user.id))
         result = ""
         for _ in range(3):
             result += choice(casino_slots)
@@ -114,7 +164,7 @@ async def roulette(message: Message):
     
 @router.message(F.text == "🎯 Поставить на одно число")
 async def roulette_one_num(message: Message, state: FSMContext):
-    if user.slots_spin_minus_money(message.from_user.id) == "Деньги списаны.":
+    if user.minus_money(message.from_user.id) == "Деньги списаны.":
         user.how_much_u_lose(message.from_user.id, 50)
         user.roulette_spin_add(message.from_user.id)
         await message.answer("Хорошо, напишите пожалуйста число от 0 до 36 включительно",
@@ -147,7 +197,7 @@ async def process_roulette_number(message: Message, state: FSMContext):
 
 @router.message(F.text == "🔴⚫🟢 Поставить на цвет")
 async def roulette_one_num(message: Message, state: FSMContext):
-    if user.slots_spin_minus_money(message.from_user.id) == "Деньги списаны.":
+    if user.minus_money(message.from_user.id) == "Деньги списаны.":
         user.how_much_u_lose(message.from_user.id, 50)
         user.roulette_spin_add(message.from_user.id)
         await message.answer("Хорошо, выберите цвет.", reply_markup=kb.roulette_color)
@@ -195,7 +245,7 @@ async def dice(message: Message):
 
 @router.message(F.text == "📦 Бросаем")
 async def drop_dice(message: Message):
-    if user.slots_spin_minus_money(message.from_user.id) == "Деньги списаны.":
+    if user.minus_money(message.from_user.id) == "Деньги списаны.":
         user.how_much_u_lose(message.from_user.id, 50)
         user.dice_drop_add(message.from_user.id)
         await message.answer("Деньги списаны!", reply_markup=kb.dice_game)
