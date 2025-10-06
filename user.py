@@ -7,6 +7,7 @@ with sq.connect("C:\\vscodepj\\casino_telegram_bot\\infouser.db") as db:   # C:\
                    money INTEGER,
                    spins INTEGER,
                    dice_games INTEGER,
+                   roulette_spins INTEGER,
                    money_lose INTEGER,
                    money_won INTEGER)""")
 
@@ -14,7 +15,7 @@ with sq.connect("C:\\vscodepj\\casino_telegram_bot\\infouser.db") as db:   # C:\
 def add_znach_table():
     with sq.connect("C:\\vscodepj\\casino_telegram_bot\\infouser.db") as db:
         cursor = db.cursor()
-        cursor.execute("""INSERT INTO personality VALUES('NULL', NULL,NULL,NULL,NULL,NULL)""")
+        cursor.execute("""INSERT INTO personality VALUES('NULL', NULL,NULL,NULL,NULL,NULL,NULL)""")
     
 
 def user_find(name):
@@ -37,15 +38,16 @@ def start_username_add(name):
 def profile_stats(id):
     with sq.connect("C:\\vscodepj\\casino_telegram_bot\\infouser.db") as db:
         cursor = db.cursor()
-        cursor.execute(f"""SELECT money, spins, dice_games, money_lose, money_won 
+        cursor.execute(f"""SELECT money, spins, dice_games, roulette_spins, money_lose, money_won 
                        FROM personality WHERE telegram_id == '{id}'""")
         x = cursor.fetchall()
         balance = f"💵 Баланс - {x[0][0]}"
         spins = f"🎰 Колличество круток - {x[0][1]}"
         dice_games = f"🎲 Колличесво игр в кости - {x[0][2]}"
-        money_lose = f"💸 Сколько ты проиграл - {x[0][3]}"
-        money_won = f"💸 Сколько ты выиграл - {x[0][4]}"
-        return balance, spins, dice_games, money_lose, money_won
+        roulette_spins = f"🛞 Колличесво круток в рулетке - {x[0][3]}"
+        money_lose = f"💸 Сколько ты проиграл - {x[0][4]}"
+        money_won = f"💸 Сколько ты выиграл - {x[0][5]}"
+        return balance, spins, dice_games, roulette_spins, money_lose, money_won
 
 
 def start_profile_stats(id):
@@ -54,6 +56,7 @@ def start_profile_stats(id):
         cursor.execute(f"""UPDATE personality SET money = 10000 WHERE telegram_id == '{id}'""")
         cursor.execute(f"""UPDATE personality SET spins = 0 WHERE telegram_id == '{id}'""")
         cursor.execute(f"""UPDATE personality SET dice_games = 0 WHERE telegram_id == '{id}'""")
+        cursor.execute(f"""UPDATE personality SET roulette_spins = 0 WHERE telegram_id == '{id}'""")
         cursor.execute(f"""UPDATE personality SET money_lose = 0 WHERE telegram_id == '{id}'""")
         cursor.execute(f"""UPDATE personality SET money_won = 0 WHERE telegram_id == '{id}'""")
     
@@ -96,4 +99,9 @@ def dice_drop_add(id):
         cursor = db.cursor()
         cursor.execute(f"""UPDATE personality SET dice_games = dice_games + 1 WHERE telegram_id == '{id}'""")
 
+
+def roulette_spin_add(id):
+    with sq.connect("C:\\vscodepj\\casino_telegram_bot\\infouser.db") as db:
+        cursor = db.cursor()
+        cursor.execute(f"""UPDATE personality SET roulette_spins = roulette_spins + 1 WHERE telegram_id == '{id}'""")
 

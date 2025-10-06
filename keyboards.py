@@ -51,5 +51,12 @@ dice_number_choose_promezh = ReplyKeyboardMarkup(keyboard=[[
 
 roulette = ReplyKeyboardMarkup(keyboard=[[
     KeyboardButton(text="🎯 Поставить на одно число"),
-    KeyboardButton(text="🔴⚫ Поставить на цвет")
+    KeyboardButton(text="🔴⚫🟢 Поставить на цвет"),
+    KeyboardButton(text="➡️ Перейти в основное меню")
+]], resize_keyboard=True)
+
+roulette_color = ReplyKeyboardMarkup(keyboard=[[
+    KeyboardButton(text="🔴"),
+    KeyboardButton(text="⚫"),
+    KeyboardButton(text="🟢")
 ]], resize_keyboard=True)

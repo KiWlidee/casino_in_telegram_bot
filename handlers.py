@@ -9,11 +9,25 @@ import user
 from aiogram import Router, F
 from aiogram.types import Message, ReplyKeyboardRemove
 from aiogram.filters import Command
+from aiogram.fsm.state import State, StatesGroup
+from aiogram.fsm.context import FSMContext
 
 
 router = Router()
 
 casino_slots = ["🍒", "🍒", "🍒", "🍏", "🍏", "🍇", "🍓", "🍑", "💩"]
+
+class RouletteStates_one(StatesGroup):
+    waiting_number = State()
+
+class RouletteStates_two_color(StatesGroup):
+    waiting_number = State()
+
+class DiceStates_one(StatesGroup):
+    waiting_number = State()
+
+class DiceStates_many(StatesGroup):
+    waiting_number = State()
 
 
 @router.message(Command("start"))
@@ -99,20 +113,80 @@ async def roulette(message: Message):
                          , reply_markup=kb.roulette)
     
 @router.message(F.text == "🎯 Поставить на одно число")
-async def roulette_one_num(message: Message):
-    await message.answer("Хорошо, выбирайте число")
-    @router.message(F.text)
-    async def choose_number(message: Message):
-        user_number = message.text
-        try:
-            user_number = int(user_number)
+async def roulette_one_num(message: Message, state: FSMContext):
+    if user.slots_spin_minus_money(message.from_user.id) == "Деньги списаны.":
+        user.how_much_u_lose(message.from_user.id, 50)
+        user.roulette_spin_add(message.from_user.id)
+        await message.answer("Хорошо, напишите пожалуйста число от 0 до 36 включительно",
+                             reply_markup=ReplyKeyboardRemove())
+        await state.set_state(RouletteStates_one.waiting_number)
+    else:
+        await message.answer("Бэйби ноу мани", reply_markup=kb.casino_menu)
+
+@router.message(RouletteStates_one.waiting_number)
+async def process_roulette_number(message: Message, state: FSMContext):
+    user_number = message.text
+    try:
+        user_number = int(user_number)
+        if 0 <= user_number <= 36:
             roulette_random_num = randint(0, 36)
             if user_number == roulette_random_num:
-                
-                await message.answer("Поздравляю! Вы выиграли 1750 вечно зелененьких!")
-        except ValueError:
-            await message.answer("Введите число от 0 до 36 включительно", kb.roulette)
+                user.how_much_u_won(message.from_user.id, 1750)
+                user.money_winner(message.from_user.id, 1750)
+                await message.answer("Поздравляю! Вы выиграли 1750 вечно зелененьких!", reply_markup=kb.roulette)
+                await state.clear()
+            else:
+                await message.answer(f"Выпало число {roulette_random_num}. Вы проиграли.", reply_markup=kb.roulette)
+            await state.clear()
+        else:
+            await message.answer("Число должно быть от 0 до 36 включительно", reply_markup=kb.roulette)
+            await state.clear()
+    except ValueError:
+        await message.answer("Введите число от 0 до 36 включительно", reply_markup=kb.roulette)
+        await state.clear()
 
+@router.message(F.text == "🔴⚫🟢 Поставить на цвет")
+async def roulette_one_num(message: Message, state: FSMContext):
+    if user.slots_spin_minus_money(message.from_user.id) == "Деньги списаны.":
+        user.how_much_u_lose(message.from_user.id, 50)
+        user.roulette_spin_add(message.from_user.id)
+        await message.answer("Хорошо, выберите цвет.", reply_markup=kb.roulette_color)
+        await state.set_state(RouletteStates_two_color.waiting_number)
+    else:
+        await message.answer("Бэйби ноу мани", reply_markup=kb.casino_menu)
+
+@router.message(RouletteStates_two_color.waiting_number)
+async def process_roulette_color(message: Message, state: FSMContext):
+    if message.text == "🔴":
+        perc_color = 1
+    elif message.text == "⚫":
+        perc_color = 2
+    elif message.text == "🟢":
+        perc_color = 0
+    else:
+        await message.answer("Ну ты дурень конечно. Из двух ты выбрал хуй пойми что", reply_markup=kb.roulette)
+        await state.clear()
+        return
+    dice_number = randint(0, 36)
+    if dice_number == 0 and perc_color == 0:
+        await message.answer("Поздравляю! Вы выиграли 1750 вечно зеленых", reply_markup=kb.roulette)
+        await state.clear()
+    elif dice_number % 2 == 0 and perc_color == 2:
+        await message.answer("Поздравляю! Вы выиграли 80 вечно зеленых", reply_markup=kb.roulette)
+        await state.clear()
+    elif dice_number % 2 != 0 and perc_color == 1:
+        await message.answer("Поздравляю! Вы выиграли 80 вечно зеленых", reply_markup=kb.roulette)
+        await state.clear()
+    else:
+        if dice_number == 0:
+            await message.answer("Вы проиграли! Цвет был: 🟢", reply_markup=kb.roulette)
+            await state.clear()
+        elif dice_number % 2 == 0:
+            await message.answer("Вы проиграли! Цвет был: ⚫", reply_markup=kb.roulette)
+            await state.clear()
+        elif dice_number % 2 != 0:
+            await message.answer("Вы проиграли! Цвет был: 🔴", reply_markup=kb.roulette)
+            await state.clear()
 
 @router.message(F.text == "🎲 Кости")
 async def dice(message: Message):
@@ -124,56 +198,64 @@ async def drop_dice(message: Message):
     if user.slots_spin_minus_money(message.from_user.id) == "Деньги списаны.":
         user.how_much_u_lose(message.from_user.id, 50)
         user.dice_drop_add(message.from_user.id)
-        await message.answer(user.slots_spin_minus_money(message.from_user.id), reply_markup=kb.dice_game)
+        await message.answer("Деньги списаны!", reply_markup=kb.dice_game)
     else:
         await message.answer("Бэйби ноу мани", reply_markup=kb.casino_menu) 
 
 @router.message(F.text == "🤔 Выбор одного числа")
-async def dice_choose_one(message: Message):
+async def dice_choose_one(message: Message, state: FSMContext):
     await message.answer("Выбери число", reply_markup=kb.dice_number_choose)
-    @router.message(F.text)
-    async def choose_number(message: Message):
-        if message.text == "1️⃣":
-            perc_num = "1"
-        elif message.text == "2️⃣":
-            perc_num = "2"
-        elif message.text == "3️⃣":
-            perc_num = "3"
-        elif message.text == "4️⃣":
-            perc_num = "4"
-        elif message.text == "5️⃣":
-            perc_num = "5"
-        elif message.text == "6️⃣":
-            perc_num = "6"
-        else:
-            await message.answer("Ну ты тупень. Выбирай из предложенных.", reply_markup=kb.dice)
-        dice_number = str(randint(1, 6))
-        if perc_num == dice_number:
-            user.how_much_u_won(message.from_user.id, 150)
-            user.money_winner(message.from_user.id, 150)
-            await message.answer("Поздравляю! Вы выиграли 150 вечно зеленых", reply_markup=kb.dice)
-        else:
-            await message.answer(f"Рандомным числом было - {dice_number}. Ты проиграл", reply_markup=kb.dice)
+    await state.set_state(DiceStates_one.waiting_number)
+
+@router.message(DiceStates_one.waiting_number)
+async def choose_number(message: Message, state: FSMContext):
+    if message.text == "1️⃣":
+        perc_num = "1"
+    elif message.text == "2️⃣":
+        perc_num = "2"
+    elif message.text == "3️⃣":
+        perc_num = "3"
+    elif message.text == "4️⃣":
+        perc_num = "4"
+    elif message.text == "5️⃣":
+        perc_num = "5"
+    elif message.text == "6️⃣":
+        perc_num = "6"
+    else:
+        await message.answer("Ну ты тупень. Выбирай из предложенных.", reply_markup=kb.dice)
+        await state.clear()
+    dice_number = str(randint(1, 6))
+    if perc_num == dice_number:
+        user.how_much_u_won(message.from_user.id, 150)
+        user.money_winner(message.from_user.id, 150)
+        await message.answer("Поздравляю! Вы выиграли 150 вечно зеленых", reply_markup=kb.dice)
+        await state.clear()
+    else:
+        await message.answer(f"Рандомным числом было - {dice_number}. Ты проиграл", reply_markup=kb.dice)
+        await state.clear()
 
 @router.message(F.text == "🤔 Выбор промежутка")
-async def dice_choose_promezh(message: Message):
-    user.money_winner(message.from_user.id, 50)
-    await message.answer("Скоро будет доступно... (Деньги возвращенны на баланс)", reply_markup=kb.dice)
-    # await message.answer("Выбери промежуток чисел", reply_markup=kb.dice_number_choose_promezh)
-    # @router.message(F.text)
-    # async def dice_chooses_pr(message: Message):
-    #     if message.text == "1️⃣2️⃣":
-    #         user_promezh = "12"
-    #     elif message.text == "3️⃣4️⃣":
-    #         user_promezh = "34"
-    #     elif message.text == "5️⃣6️⃣":
-    #         user_promezh = "56"
-    #     else:
-    #         await message.answer("Ну ты тупень. Выбирай из предложенных.", reply_markup=kb.dice) 
-    #     dice_number = str(randint(1, 6))
-    #     if dice_number in user_promezh:
-    #         user.how_much_u_won(message.from_user.id, 75)
-    #         user.money_winner(message.from_user.id, 75)
-    #         await message.answer("Поздравляю! Вы выиграли 75 вечно зеленых", reply_markup=kb.dice)
-    #     else:
-    #         await message.answer(f"Рандомным числом было - {dice_number}. Ты проиграл", reply_markup=kb.dice)
+async def dice_choose_promezh(message: Message, state: FSMContext):
+    await message.answer("Выбери промежуток чисел", reply_markup=kb.dice_number_choose_promezh)
+    await state.set_state(DiceStates_many.waiting_number)
+@router.message(DiceStates_many.waiting_number)
+async def dice_chooses_pr(message: Message, state: FSMContext):
+    if message.text == "1️⃣2️⃣":
+        user_promezh = "12"
+    elif message.text == "3️⃣4️⃣":
+        user_promezh = "34"
+    elif message.text == "5️⃣6️⃣":
+        user_promezh = "56"
+    else:
+        await message.answer("Ну ты тупень. Выбирай из предложенных.", reply_markup=kb.dice)
+        await state.clear()
+
+    dice_number = str(randint(1, 6))
+    if dice_number in user_promezh:
+        user.how_much_u_won(message.from_user.id, 75)
+        user.money_winner(message.from_user.id, 75)
+        await message.answer("Поздравляю! Вы выиграли 75 вечно зеленых", reply_markup=kb.dice)
+        await state.clear()
+    else:
+        await message.answer(f"Рандомным числом было - {dice_number}. Ты проиграл", reply_markup=kb.dice)
+        await state.clear()
