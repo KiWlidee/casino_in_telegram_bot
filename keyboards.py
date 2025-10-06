@@ -13,6 +13,7 @@ casino_menu = ReplyKeyboardMarkup(keyboard=[[
 main_menu = ReplyKeyboardMarkup(keyboard=[[
     KeyboardButton(text="🪪 Профиль"),
     KeyboardButton(text="🎰 Крутить слоты"),
+    KeyboardButton(text="🛞 Рулетка"),
     KeyboardButton(text="🎲 Кости"),
     KeyboardButton(text="🔚 Выйти")
 ]], resize_keyboard=True)
@@ -45,4 +46,10 @@ dice_number_choose_promezh = ReplyKeyboardMarkup(keyboard=[[
     KeyboardButton(text="1️⃣2️⃣"),
     KeyboardButton(text="3️⃣4️⃣"),
     KeyboardButton(text="5️⃣6️⃣"),
+]], resize_keyboard=True)
+
+
+roulette = ReplyKeyboardMarkup(keyboard=[[
+    KeyboardButton(text="🎯 Поставить на одно число"),
+    KeyboardButton(text="🔴⚫ Поставить на цвет")
 ]], resize_keyboard=True)

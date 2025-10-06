@@ -18,8 +18,9 @@ casino_slots = ["🍒", "🍒", "🍒", "🍏", "🍏", "🍇", "🍓", "🍑", 
 
 @router.message(Command("start"))
 async def start(message: Message):
-    await message.answer(f"""Привет {message.from_user.full_name}! Это казиныч бот со слотами.
-Валюта внутриигровая, так что не очкуй.""", reply_markup=kb.register)
+    await message.answer(f"""Привет {message.from_user.full_name}! Это казиныч со слотами.
+Валюта внутриигровая, так что не очкуй.
+Но есть бабки закончатся, то нужно будет жестко депать, или просить денюжки у Админа.""", reply_markup=kb.register)
     
 @router.message(F.text == "✍ Зарегистрироваться / 🔑 Войти")
 async def register(message: Message):
@@ -85,8 +86,33 @@ async def spin_slots(message: Message):
             await message.answer("Поздравляю! Вы выиграли пэрсик и 2000 вечно зеленых")
             user.how_much_u_won(message.from_user.id, 2000)
             user.money_winner(message.from_user.id, 2000)
+        elif result == casino_slots[-1] * 3:
+            await message.answer("Поздравляю! Вы проебали 1000 вечно зеленых!")
+            user.how_much_u_lose(message.from_user.id, 1000)
+            user.money_winner(message.from_user.id, -1000)
     else:
         await message.answer("Бэйби ноу мани", reply_markup=kb.casino_menu)
+
+@router.message(F.text == "🛞 Рулетка")
+async def roulette(message: Message):
+    await message.answer("Добро пожаловать в Европейскую рулетку! Каждая крутка обойдется в 50 вечно зеленых."
+                         , reply_markup=kb.roulette)
+    
+@router.message(F.text == "🎯 Поставить на одно число")
+async def roulette_one_num(message: Message):
+    await message.answer("Хорошо, выбирайте число")
+    @router.message(F.text)
+    async def choose_number(message: Message):
+        user_number = message.text
+        try:
+            user_number = int(user_number)
+            roulette_random_num = randint(0, 36)
+            if user_number == roulette_random_num:
+                
+                await message.answer("Поздравляю! Вы выиграли 1750 вечно зелененьких!")
+        except ValueError:
+            await message.answer("Введите число от 0 до 36 включительно", kb.roulette)
+
 
 @router.message(F.text == "🎲 Кости")
 async def dice(message: Message):
@@ -131,21 +157,23 @@ async def dice_choose_one(message: Message):
 
 @router.message(F.text == "🤔 Выбор промежутка")
 async def dice_choose_promezh(message: Message):
-    await message.answer("Выбери промежуток чисел", reply_markup=kb.dice_number_choose_promezh)
-    @router.message(F.text)
-    async def dice_chooses_pr(message: Message):
-        if message.text == "1️⃣2️⃣":
-            user_promezh = "12"
-        elif message.text == "3️⃣4️⃣":
-            user_promezh = "34"
-        elif message.text == "5️⃣6️⃣":
-            user_promezh = "56"
-        else:
-            await message.answer("Ну ты тупень. Выбирай из предложенных.", reply_markup=kb.dice) 
-        dice_number = str(randint(1, 6))
-        if dice_number in user_promezh:
-            user.how_much_u_won(message.from_user.id, 75)
-            user.money_winner(message.from_user.id, 75)
-            await message.answer("Поздравляю! Вы выиграли 75 вечно зеленых", reply_markup=kb.dice)
-        else:
-            await message.answer(f"Рандомным числом было - {dice_number}. Ты проиграл", reply_markup=kb.dice)
+    user.money_winner(message.from_user.id, 50)
+    await message.answer("Скоро будет доступно... (Деньги возвращенны на баланс)", reply_markup=kb.dice)
+    # await message.answer("Выбери промежуток чисел", reply_markup=kb.dice_number_choose_promezh)
+    # @router.message(F.text)
+    # async def dice_chooses_pr(message: Message):
+    #     if message.text == "1️⃣2️⃣":
+    #         user_promezh = "12"
+    #     elif message.text == "3️⃣4️⃣":
+    #         user_promezh = "34"
+    #     elif message.text == "5️⃣6️⃣":
+    #         user_promezh = "56"
+    #     else:
+    #         await message.answer("Ну ты тупень. Выбирай из предложенных.", reply_markup=kb.dice) 
+    #     dice_number = str(randint(1, 6))
+    #     if dice_number in user_promezh:
+    #         user.how_much_u_won(message.from_user.id, 75)
+    #         user.money_winner(message.from_user.id, 75)
+    #         await message.answer("Поздравляю! Вы выиграли 75 вечно зеленых", reply_markup=kb.dice)
+    #     else:
+    #         await message.answer(f"Рандомным числом было - {dice_number}. Ты проиграл", reply_markup=kb.dice)
