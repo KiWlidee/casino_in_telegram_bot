@@ -70,10 +70,9 @@ async def process_admin_password(message: Message, state: FSMContext):
     if message.text == "8038":
         await message.answer("Привет, Админ!", reply_markup=kb.ADMIN_panel)
         await state.clear()
-    else: 
-        await register(message)
-        state.clear()
-    
+    else:
+        await state.clear()
+        await start(message)    
 
 @router.message(F.text == "✏️ Добавить(уменьшить через (-)) деньги пользователю")
 async def admin_change_money(message: Message, state: FSMContext):

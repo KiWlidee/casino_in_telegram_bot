@@ -22,6 +22,8 @@ main_menu = ReplyKeyboardMarkup(keyboard=[[
     KeyboardButton(text="🪪 Профиль"),
     KeyboardButton(text="🎰 Крутить слоты"),
     KeyboardButton(text="🛞 Рулетка"),
+    KeyboardButton(text="📈 Краш"),
+    KeyboardButton(text="👟 Слови макасины"),
     KeyboardButton(text="🎲 Кости"),
     KeyboardButton(text="🔚 Выйти")
 ]], resize_keyboard=True)
@@ -67,4 +69,34 @@ roulette_color = ReplyKeyboardMarkup(keyboard=[[
     KeyboardButton(text="🔴"),
     KeyboardButton(text="⚫"),
     KeyboardButton(text="🟢")
+]], resize_keyboard=True)
+
+crash = ReplyKeyboardMarkup(keyboard=[[
+    KeyboardButton(text="📉 Играем"),
+    KeyboardButton(text="➡️ Перейти в основное меню")
+]], resize_keyboard=True)
+
+crash_game = ReplyKeyboardMarkup(keyboard=[[
+    KeyboardButton(text="1.1"),
+    KeyboardButton(text="1.25"),
+    KeyboardButton(text="1.4"),
+    KeyboardButton(text="1.5"),
+    KeyboardButton(text="1.75"),
+    KeyboardButton(text="2"),
+    KeyboardButton(text="2.5"),
+    KeyboardButton(text="3.5"),
+    KeyboardButton(text="5"),
+    KeyboardButton(text="7.5"),
+    KeyboardButton(text="10"),
+    KeyboardButton(text="15"),
+    KeyboardButton(text="25"),
+    KeyboardButton(text="40"),
+]], resize_keyboard=True)
+
+
+get_makasini_menu = ReplyKeyboardMarkup(keyboard=[[
+    KeyboardButton(text="📜 Правила"),
+    KeyboardButton(text="⬅️ Левый макасинчик"),
+    KeyboardButton(text="➡️ Правый макасинчик"),
+    KeyboardButton(text="➡️ Перейти в основное меню")
 ]], resize_keyboard=True)
