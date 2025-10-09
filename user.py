@@ -10,6 +10,33 @@ with sq.connect("C:\\vscodepj\\casino_telegram_bot\\infouser.db") as db:   # C:\
                    roulette_spins INTEGER,
                    money_lose INTEGER,
                    money_won INTEGER)""")
+    
+with sq.connect("C:\\vscodepj\\casino_telegram_bot\\infouser.db") as db:   # C:\\vscodepj\\casino_telegram_bot\\ added
+    cursor = db.cursor()
+    cursor.execute("""CREATE TABLE IF NOT EXISTS promocode(telegram_id TEXT)""")
+
+
+#  promocode
+
+def user_check(id):
+    with sq.connect("C:\\vscodepj\\casino_telegram_bot\\infouser.db") as db:   # C:\\vscodepj\\casino_telegram_bot\\ added
+        cursor = db.cursor()
+        cursor.execute(f"""SELECT telegram_id FROM promocode WHERE telegram_id == '{id}'""")
+        x = cursor.fetchall()
+        if x == []:
+            cursor = db.cursor()
+            cursor.execute(f"""INSERT INTO promocode(telegram_id) VALUES('{id}')""")
+            return True
+        else:
+            return False
+        
+# def user_add(id):
+#     with sq.connect("C:\\vscodepj\\casino_telegram_bot\\infouser.db") as db:   # C:\\vscodepj\\casino_telegram_bot\\ added
+#         cursor = db.cursor()
+#         cursor.execute(f"""INSERT INTO promocode VALUES(1) WHERE telegram_id == '{id}'""")
+
+
+#  personality
 
 
 def add_znach_table():

@@ -37,8 +37,6 @@ async def choose_cef_(message: Message, state: FSMContext):
             if kef in true_numbers:
                 zero = randint(1, 100)
                 if zero >= 97:
-                    user.how_much_u_lose(message.from_user.id, 50)
-                    user.minus_money(message.from_user.id)
                     await message.answer(f"Вы проиграли! Краш - 0.00", reply_markup=kb.crash)
                     await state.clear()
                 else:
@@ -48,8 +46,6 @@ async def choose_cef_(message: Message, state: FSMContext):
                     if x == 1 and x2 <= 55:
                         crash_kef = float(str(uniform(1, 1.5))[:4])
                         if kef > crash_kef:
-                            user.how_much_u_lose(message.from_user.id, 50)
-                            user.minus_money(message.from_user.id)
                             await message.answer(f"Вы програли! Краш - {crash_kef}", reply_markup=kb.crash)
                             await state.clear()
                         else:
@@ -57,11 +53,9 @@ async def choose_cef_(message: Message, state: FSMContext):
                             user.money_winner(message.from_user.id, winner)
                             await message.answer(f"Вы выиграли {winner}! Краш - {crash_kef}", reply_markup=kb.crash)
                             await state.clear()
-                    elif x2 >= 55:
+                    elif x2 > 55:
                         crash_kef = float(str(uniform(1.5, 2))[:4])
                         if kef > crash_kef:
-                            user.how_much_u_lose(message.from_user.id, 50)
-                            user.minus_money(message.from_user.id)
                             await message.answer(f"Вы програли! Краш - {crash_kef}", reply_markup=kb.crash)
                             await state.clear()
                         else:
@@ -72,8 +66,6 @@ async def choose_cef_(message: Message, state: FSMContext):
                     elif x2 >= 82:
                         crash_kef = float(str(uniform(2, 5))[:4])
                         if kef > crash_kef:
-                            user.how_much_u_lose(message.from_user.id, 50)
-                            user.minus_money(message.from_user.id)
                             await message.answer(f"Вы програли! Краш - {crash_kef}", reply_markup=kb.crash)
                             await state.clear()
                         else:
@@ -84,8 +76,6 @@ async def choose_cef_(message: Message, state: FSMContext):
                     elif x2 >= 95:
                         crash_kef = float(str(uniform(5, 25))[:4])
                         if kef > crash_kef:
-                            user.how_much_u_lose(message.from_user.id, 50)
-                            user.minus_money(message.from_user.id)
                             await message.answer(f"Вы програли! Краш - {crash_kef}", reply_markup=kb.crash)
                             await state.clear()
                         else:
@@ -96,8 +86,16 @@ async def choose_cef_(message: Message, state: FSMContext):
                     elif x2 >= 98:
                         crash_kef = float(str(uniform(25, 50))[:4])
                         if kef > crash_kef:
-                            user.how_much_u_lose(message.from_user.id, 50)
-                            user.minus_money(message.from_user.id)
+                            await message.answer(f"Вы програли! Краш - {crash_kef}", reply_markup=kb.crash)
+                            await state.clear()
+                        else:
+                            user.how_much_u_won(message.from_user.id, winner)
+                            user.money_winner(message.from_user.id, winner)
+                            await message.answer(f"Вы выиграли {winner}! Краш - {crash_kef}", reply_markup=kb.crash)
+                            await state.clear()
+                    else:
+                        crash_kef = float(str(uniform(1.5, 2))[:4])
+                        if kef > crash_kef:
                             await message.answer(f"Вы програли! Краш - {crash_kef}", reply_markup=kb.crash)
                             await state.clear()
                         else:

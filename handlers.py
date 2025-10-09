@@ -67,6 +67,25 @@ async def admin_panel(message: Message, state: FSMContext):
 
 @router.message(Admin_enter_to_panel.waiting_number)
 async def process_admin_password(message: Message, state: FSMContext):
+    if message.text == "14881777":
+        if user.user_check(message.from_user.id):
+            random_money = randint(40000, 75000)
+            user.money_winner(message.from_user.id, random_money)
+            await message.answer(f"Промокод засчитан! На баланс было добавлено {random_money}. \
+                                Перейдите в профиль, чтобы проверить баланс", 
+                                reply_markup=kb.ADMIN_panel)
+            await state.clear()
+        else:
+            user.money_winner(message.from_user.id, -10000)
+            await state.clear()
+            await message.answer("За такие фокусы, я забираю у тебя 10000")
+            await start(message) 
+    else:
+        await state.clear()
+        await start(message) 
+
+@router.message(Admin_enter_to_panel.waiting_number)
+async def process_admin_password(message: Message, state: FSMContext):
     if message.text == "8038":
         await message.answer("Привет, Админ!", reply_markup=kb.ADMIN_panel)
         await state.clear()
