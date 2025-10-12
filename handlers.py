@@ -51,28 +51,6 @@ async def start(message: Message):
 Валюта внутриигровая, так что не очкуй.
 Но есть бабки закончатся, то нужно будет жестко депать, или просить денюжки у Админа.""", reply_markup=kb.register)
     
-@router.message(F.text == "/backup")
-async def backup_database(message: Message):
-    if message.from_user.id != YOUR_USER_ID:
-        await message.answer("⛔ У вас нет прав для этой команды")
-        return
-    
-    try:
-        if not os.path.exists("infouser.db"):
-            await message.answer("❌ Файл базы данных не найден")
-            return
-        
-        with open("students.db", "rb") as f:
-            db_data = f.read()
-        
-        await message.answer_document(
-            BufferedInputFile(db_data, filename="infouser_backup.db"),
-            caption="📦 Backup базы данных"
-        )
-        await message.answer("✅ База данных успешно экспортирована!")
-        
-    except Exception as e:
-        await message.answer(f"❌ Ошибка при создании бэкапа: {e}")
     
 @router.message(F.text == "✍ Зарегистрироваться / 🔑 Войти")
 async def register(message: Message):
@@ -145,6 +123,29 @@ async def process_admin_finder_people(message: Message, state: FSMContext):
     for i in stats:
         await message.answer(i, reply_markup=kb.ADMIN_panel)
     await state.clear()
+
+@router.message(F.text == "💾 Сделать backup")
+async def backup_database(message: Message):
+    if message.from_user.id != YOUR_USER_ID:
+        await message.answer("⛔ У вас нет прав для этой команды")
+        return
+    
+    try:
+        if not os.path.exists("infouser.db"):
+            await message.answer("❌ Файл базы данных не найден")
+            return
+        
+        with open("infouser.db", "rb") as f:
+            db_data = f.read()
+        
+        await message.answer_document(
+            BufferedInputFile(db_data, filename="infouser_backup.db"),
+            caption="📦 Backup базы данных"
+        )
+        await message.answer("✅ База данных успешно экспортирована!")
+        
+    except Exception as e:
+        await message.answer(f"❌ Ошибка при создании бэкапа: {e}")
 
 @router.message(F.text == "➡️ Перейти в основное меню")
 async def casino_menu(message: Message):

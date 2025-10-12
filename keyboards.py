@@ -9,6 +9,7 @@ register = ReplyKeyboardMarkup(keyboard=[[
 ADMIN_panel = ReplyKeyboardMarkup(keyboard=[[
     KeyboardButton(text="✏️ Добавить(уменьшить через (-)) деньги пользователю"),
     KeyboardButton(text="👥 Поиск профиля пользователя по id"),
+    KeyboardButton(text="💾 Сделать backup"),
     KeyboardButton(text="➡️ Перейти в основное меню")
 ]], resize_keyboard=True)
 
