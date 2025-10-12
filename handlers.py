@@ -79,7 +79,10 @@ async def process_admin_password(message: Message, state: FSMContext):
             user.money_winner(message.from_user.id, -10000)
             await state.clear()
             await message.answer("За такие фокусы, я забираю у тебя 10000")
-            await start(message) 
+            await start(message)
+    elif message.text == "8038":
+        await message.answer("Привет, Админ!", reply_markup=kb.ADMIN_panel)
+        await state.clear()
     else:
         await state.clear()
         await start(message) 

@@ -1,6 +1,8 @@
 import sqlite3 as sq
 
-with sq.connect("C:\\vscodepj\\casino_telegram_bot\\infouser.db") as db:   # C:\\vscodepj\\casino_telegram_bot\\ added
+DB_PATH = "infouser.db"
+
+with sq.connect(DB_PATH) as db:   # C:\\vscodepj\\casino_telegram_bot\\ added
     cursor = db.cursor()
     cursor.execute("""CREATE TABLE IF NOT EXISTS 
                    personality(telegram_id TEXT,
@@ -11,7 +13,7 @@ with sq.connect("C:\\vscodepj\\casino_telegram_bot\\infouser.db") as db:   # C:\
                    money_lose INTEGER,
                    money_won INTEGER)""")
     
-with sq.connect("C:\\vscodepj\\casino_telegram_bot\\infouser.db") as db:   # C:\\vscodepj\\casino_telegram_bot\\ added
+with sq.connect("infouser.db") as db:   # C:\\vscodepj\\casino_telegram_bot\\ added
     cursor = db.cursor()
     cursor.execute("""CREATE TABLE IF NOT EXISTS promocode(telegram_id TEXT)""")
 
@@ -19,7 +21,7 @@ with sq.connect("C:\\vscodepj\\casino_telegram_bot\\infouser.db") as db:   # C:\
 #  promocode
 
 def user_check(id):
-    with sq.connect("C:\\vscodepj\\casino_telegram_bot\\infouser.db") as db:   # C:\\vscodepj\\casino_telegram_bot\\ added
+    with sq.connect("infouser.db") as db:   # C:\\vscodepj\\casino_telegram_bot\\ added
         cursor = db.cursor()
         cursor.execute(f"""SELECT telegram_id FROM promocode WHERE telegram_id == '{id}'""")
         x = cursor.fetchall()
@@ -31,7 +33,7 @@ def user_check(id):
             return False
         
 # def user_add(id):
-#     with sq.connect("C:\\vscodepj\\casino_telegram_bot\\infouser.db") as db:   # C:\\vscodepj\\casino_telegram_bot\\ added
+#     with sq.connect("infouser.db") as db:   # C:\\vscodepj\\casino_telegram_bot\\ added
 #         cursor = db.cursor()
 #         cursor.execute(f"""INSERT INTO promocode VALUES(1) WHERE telegram_id == '{id}'""")
 
@@ -40,13 +42,13 @@ def user_check(id):
 
 
 def add_znach_table():
-    with sq.connect("C:\\vscodepj\\casino_telegram_bot\\infouser.db") as db:
+    with sq.connect("infouser.db") as db:
         cursor = db.cursor()
         cursor.execute("""INSERT INTO personality VALUES('NULL', NULL,NULL,NULL,NULL,NULL,NULL)""")
     
 
 def user_find(name):
-    with sq.connect("C:\\vscodepj\\casino_telegram_bot\\infouser.db") as db:
+    with sq.connect("infouser.db") as db:
         cursor = db.cursor()
         cursor.execute(f"""SELECT telegram_id FROM personality WHERE telegram_id == '{name}'""")
         if cursor.fetchall() == [] or cursor.fetchall() == 'NULL':
@@ -57,13 +59,13 @@ def user_find(name):
 
 def start_username_add(name):
     if user_find(name):
-        with sq.connect("C:\\vscodepj\\casino_telegram_bot\\infouser.db") as db:
+        with sq.connect("infouser.db") as db:
             cursor = db.cursor()
             cursor.execute(f"""UPDATE personality SET telegram_id = '{name}' WHERE telegram_id == 'NULL'""")
 
 
 def profile_stats(id):
-    with sq.connect("C:\\vscodepj\\casino_telegram_bot\\infouser.db") as db:
+    with sq.connect("infouser.db") as db:
         cursor = db.cursor()
         cursor.execute(f"""SELECT money, spins, dice_games, roulette_spins, money_lose, money_won 
                        FROM personality WHERE telegram_id == '{id}'""")
@@ -78,7 +80,7 @@ def profile_stats(id):
 
 
 def start_profile_stats(id):
-    with sq.connect("C:\\vscodepj\\casino_telegram_bot\\infouser.db") as db:
+    with sq.connect("infouser.db") as db:
         cursor = db.cursor()
         cursor.execute(f"""UPDATE personality SET money = 10000 WHERE telegram_id == '{id}'""")
         cursor.execute(f"""UPDATE personality SET spins = 0 WHERE telegram_id == '{id}'""")
@@ -89,25 +91,25 @@ def start_profile_stats(id):
     
 
 def how_much_u_lose(id, money):
-    with sq.connect("C:\\vscodepj\\casino_telegram_bot\\infouser.db") as db:
+    with sq.connect("infouser.db") as db:
         cursor = db.cursor()
         cursor.execute(f"""UPDATE personality SET money_lose = money_lose + {money} WHERE telegram_id == '{id}'""")
 
 
 def how_much_u_won(id, money):
-    with sq.connect("C:\\vscodepj\\casino_telegram_bot\\infouser.db") as db:
+    with sq.connect("infouser.db") as db:
         cursor = db.cursor()
         cursor.execute(f"""UPDATE personality SET money_won = money_won + {money} WHERE telegram_id == '{id}'""")
 
 
 def slots_spin_add(id):
-    with sq.connect("C:\\vscodepj\\casino_telegram_bot\\infouser.db") as db:
+    with sq.connect("infouser.db") as db:
         cursor = db.cursor()
         cursor.execute(f"""UPDATE personality SET spins = spins + 1 WHERE telegram_id == '{id}'""")
 
 
 def minus_money(id):
-    with sq.connect("C:\\vscodepj\\casino_telegram_bot\\infouser.db") as db:
+    with sq.connect("infouser.db") as db:
         cursor = db.cursor()
         cursor.execute(f"""UPDATE personality SET money = money - 50 WHERE telegram_id == '{id}' AND money >= 50""")
         if cursor.rowcount > 0:
@@ -116,19 +118,19 @@ def minus_money(id):
             return "Недостаточно средств."
         
 def money_winner(id, money):
-    with sq.connect("C:\\vscodepj\\casino_telegram_bot\\infouser.db") as db:
+    with sq.connect("infouser.db") as db:
         cursor = db.cursor()
         cursor.execute(f"""UPDATE personality SET money = money + {money} WHERE telegram_id == '{id}'""")
 
 
 def dice_drop_add(id):
-    with sq.connect("C:\\vscodepj\\casino_telegram_bot\\infouser.db") as db:
+    with sq.connect("infouser.db") as db:
         cursor = db.cursor()
         cursor.execute(f"""UPDATE personality SET dice_games = dice_games + 1 WHERE telegram_id == '{id}'""")
 
 
 def roulette_spin_add(id):
-    with sq.connect("C:\\vscodepj\\casino_telegram_bot\\infouser.db") as db:
+    with sq.connect("infouser.db") as db:
         cursor = db.cursor()
         cursor.execute(f"""UPDATE personality SET roulette_spins = roulette_spins + 1 WHERE telegram_id == '{id}'""")
 

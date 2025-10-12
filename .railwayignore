@@ -1,0 +1,6 @@
+data.py
+infouser.db
+.git/
+node_modules/
+.env.local
+*.log
