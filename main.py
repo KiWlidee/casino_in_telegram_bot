@@ -1,3 +1,5 @@
+import os
+
 from aiogram import Bot, Dispatcher
 
 from asyncio import run as arun
@@ -5,7 +7,9 @@ from asyncio import run as arun
 from handlers import router
 from handler.crash import crash_router
 from handler.get_makasini import makasini_router
-from data import TOKEN
+
+TOKEN = os.getenv('TOKEN')
+# from data import TOKEN
 
 async def main():
     bot = Bot(TOKEN)
