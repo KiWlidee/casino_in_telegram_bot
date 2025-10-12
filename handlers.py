@@ -1,3 +1,5 @@
+import os
+
 from time import sleep
 
 from random import choice, randint
@@ -7,7 +9,7 @@ import keyboards as kb
 import user
 
 from aiogram import Router, F
-from aiogram.types import Message, ReplyKeyboardRemove
+from aiogram.types import Message, ReplyKeyboardRemove, BufferedInputFile
 from aiogram.filters import Command
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.context import FSMContext
@@ -41,12 +43,36 @@ class DiceStates_one(StatesGroup):
 class DiceStates_many(StatesGroup):
     waiting_number = State()
 
+YOUR_USER_ID = 1414872963
 
 @router.message(Command("start"))
 async def start(message: Message):
     await message.answer(f"""Привет {message.from_user.full_name}! Это казиныч со слотами.
 Валюта внутриигровая, так что не очкуй.
 Но есть бабки закончатся, то нужно будет жестко депать, или просить денюжки у Админа.""", reply_markup=kb.register)
+    
+@router.message(F.text == "/backup")
+async def backup_database(message: Message):
+    if message.from_user.id != YOUR_USER_ID:
+        await message.answer("⛔ У вас нет прав для этой команды")
+        return
+    
+    try:
+        if not os.path.exists("infouser.db"):
+            await message.answer("❌ Файл базы данных не найден")
+            return
+        
+        with open("students.db", "rb") as f:
+            db_data = f.read()
+        
+        await message.answer_document(
+            BufferedInputFile(db_data, filename="infouser_backup.db"),
+            caption="📦 Backup базы данных"
+        )
+        await message.answer("✅ База данных успешно экспортирована!")
+        
+    except Exception as e:
+        await message.answer(f"❌ Ошибка при создании бэкапа: {e}")
     
 @router.message(F.text == "✍ Зарегистрироваться / 🔑 Войти")
 async def register(message: Message):
@@ -134,6 +160,7 @@ async def profile(message: Message):
     """Вывести: Баланс, колличество круток в слотах, 
        колличество сыгранных игр в dice, сколько денег проиграл/выиграл"""
     stats = user.profile_stats(message.from_user.id)
+    await message.answer(f"🆔 Ваш id - {message.from_user.id}")
     for i in stats:
         await message.answer(i, reply_markup=kb.main_menu)
 
